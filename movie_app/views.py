@@ -1,8 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Director,Movie,Review
-from .serializers import DirectorSerializer , MovieSerializer, ReviewSerializer
-
+from .serializers import *
+from .models import *
 
 @api_view(['GET'])
 def director_view(request):
@@ -61,3 +60,9 @@ def test_view(request):
 
     }
     return Response(data=dict_)
+
+@api_view(['GET'])
+def film_list_review_view(request):
+    movie = Movie.objects.all()
+    serializer = FilmListSerializer(movie, many=True)
+    return Response(data=serializer.data)
