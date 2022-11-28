@@ -13,7 +13,7 @@ class Director(models.Model):
     def movie_count(self):
         return len(self.movies.all())
 
-class Movie(models.Model):
+class  Movie(models.Model):
     class Meta:
         verbose_name='Фильм'
         verbose_name_plural = 'Фильмы'

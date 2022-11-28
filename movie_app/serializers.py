@@ -23,7 +23,7 @@ class MovieSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
     class Meta:
         model = Movie
-        fields = 'id title description duration director rating'
+        fields = 'id title description duration director rating'.split()
 
     def get_rating(self,movie):
         return movie.rating()
