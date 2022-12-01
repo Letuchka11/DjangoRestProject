@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from .models import Movie,Director,Review
 
@@ -31,7 +32,7 @@ class MovieSerializer(serializers.ModelSerializer):
 class MovieNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = 'title'.split()
+        fields = 'id title'.split()
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -59,3 +60,24 @@ class FilmListSerializer(serializers.ModelSerializer):
     def get_rating(self, movei):
         return movei.rating()
 
+
+class DirectorValidateSerializer(serializers.Serializer):
+    name = serializers.CharField(min_length=3,max_length=70)
+
+class ReviewValidateSerializer(serializers.Serializer):
+    movie = serializers.IntegerField(min_value=1)
+    text = serializers.CharField(min_length=5)
+    stars = serializers.FloatField(min_value=1)
+
+class FilmValidateSerializer(serializers.Serializer):
+    title = serializers.CharField(min_length=3,max_length=1000)
+    description = serializers.CharField(min_length=5)
+    duration = serializers.IntegerField(min_value=5)
+    director_id = serializers.IntegerField(min_value=1)
+
+    def validate_director_id(self,director_id):
+        try:
+            Director.objects.get(id=director_id)
+        except Director.DoesNotExist:
+            raise ValidationError("Director not found")
+        return director_id
