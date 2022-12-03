@@ -1,13 +1,15 @@
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .serializers import *
 from .models import *
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def director_view(request):
     if request.method == 'GET':
-        print(request.data)
+        print(request.user)
         directors = Director.objects.all()
         serializer = DirectorSerializer(directors, many=True)
         return Response(data=serializer.data)
@@ -26,6 +28,7 @@ def director_view(request):
                         })
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def director_id_view(request, **kwargs):
     try:
         directors = Director.objects.get(id=kwargs['id'])
@@ -49,7 +52,8 @@ def director_id_view(request, **kwargs):
             "message" : "Operation done successfuly"
         })
 @api_view(['GET', 'POST'])
-def movie_view(request):
+@permission_classes([IsAuthenticated])
+def movie_view(request, **kwargs):
     if request.method == 'GET':
         movie = Movie.objects.all()
         serializer = MovieSerializer(movie, many=True)
@@ -73,6 +77,7 @@ def movie_view(request):
                         })
 
 @api_view(['GET','PUT','DELETE'])
+@permission_classes([IsAuthenticated])
 def movie_id_view(request, **kwargs):
     try:
         movie = Movie.objects.get(id=kwargs['id'])
@@ -100,6 +105,7 @@ def movie_id_view(request, **kwargs):
         movie.delete()
         return Response(data=status.HTTP_204_NO_CONTENT)
 @api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
 def review_view(request):
     review = Review.objects.all()
     if request.method == 'GET':
@@ -110,17 +116,18 @@ def review_view(request):
         if not serializer.is_valid():
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE,
                             data={'errors': serializer.errors})
-        author = request.data.get("author", None)
         stars = serializer.validated_data["stars"]
         text =  serializer.validated_data["text"]
         movie =  serializer.validated_data["movie"]
-        reviewAPI = Review.objects.create(author=author,stars=stars,text=text,movie=movie)
+        # movie = request.data['movie']
+        reviewAPI = Review.objects.create(author=request.user,stars=stars,text=text,movie=movie)
         reviewAPI.save()
         return Response(status=status.HTTP_201_CREATED,data={
             "message": "Review was created"
         })
 
 @api_view(['GET','PUT','DELETE'])
+@permission_classes([IsAuthenticated])
 def review_id_view(request, **kwargs):
     try:
         review = Review.objects.get(id=kwargs['id'])
@@ -159,6 +166,7 @@ def test_view(request):
     return Response(data=dict_)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def film_list_review_view(request):
     movie = Movie.objects.all()
     serializer = FilmListSerializer(movie, many=True)

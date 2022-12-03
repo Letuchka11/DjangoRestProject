@@ -29,15 +29,15 @@ class MovieSerializer(serializers.ModelSerializer):
     def get_rating(self,movie):
         return movie.rating()
 
-class MovieNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Movie
-        fields = 'id title'.split()
+# class MovieNameSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Movie
+#         fields = 'id title'.split()
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = UserSimpleSerializer()
-    movie = MovieNameSerializer()
+    movie = MovieSerializer()
     class Meta:
         model = Review
         fields = '__all__'
@@ -67,17 +67,24 @@ class DirectorValidateSerializer(serializers.Serializer):
 class ReviewValidateSerializer(serializers.Serializer):
     movie = serializers.IntegerField(min_value=1)
     text = serializers.CharField(min_length=5)
-    stars = serializers.FloatField(min_value=1)
+    stars = serializers.FloatField(min_value=1,required=True)
+
+    def validate_movie_id(self,movie):
+        try:
+            Movie.objects.filter(id=movie)
+        except Movie.DoesNotExist:
+            raise ValidationError("Movie not found")
+        return movie
 
 class FilmValidateSerializer(serializers.Serializer):
     title = serializers.CharField(min_length=3,max_length=1000)
     description = serializers.CharField(min_length=5)
     duration = serializers.IntegerField(min_value=5)
-    director_id = serializers.IntegerField(min_value=1)
+    director = serializers.IntegerField(min_value=1)
 
-    def validate_director_id(self,director_id):
+    def validate_director_id(self,director):
         try:
-            Director.objects.get(id=director_id)
+            Director.objects.get(id=director)
         except Director.DoesNotExist:
             raise ValidationError("Director not found")
-        return director_id
+        return director
