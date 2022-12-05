@@ -118,9 +118,9 @@ def review_view(request):
                             data={'errors': serializer.errors})
         stars = serializer.validated_data["stars"]
         text =  serializer.validated_data["text"]
-        movie =  serializer.validated_data["movie"]
+        movie_id =  serializer.validated_data["movie_id"]
         # movie = request.data['movie']
-        reviewAPI = Review.objects.create(author=request.user,stars=stars,text=text,movie=movie)
+        reviewAPI = Review.objects.create(author=request.user,stars=stars,text=text,movie=movie_id)
         reviewAPI.save()
         return Response(status=status.HTTP_201_CREATED,data={
             "message": "Review was created"

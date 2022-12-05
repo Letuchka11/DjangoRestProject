@@ -65,16 +65,16 @@ class DirectorValidateSerializer(serializers.Serializer):
     name = serializers.CharField(min_length=3,max_length=70)
 
 class ReviewValidateSerializer(serializers.Serializer):
-    movie = serializers.IntegerField(min_value=1)
+    movie_id = serializers.IntegerField(min_value=1)
     text = serializers.CharField(min_length=5)
     stars = serializers.FloatField(min_value=1,required=True)
 
-    def validate_movie_id(self,movie):
+    def validate_movie_id(self,movie_id):
         try:
-            Movie.objects.filter(id=movie)
+            Movie.objects.filter(id=movie_id)
         except Movie.DoesNotExist:
             raise ValidationError("Movie not found")
-        return movie
+        return movie_id
 
 class FilmValidateSerializer(serializers.Serializer):
     title = serializers.CharField(min_length=3,max_length=1000)
