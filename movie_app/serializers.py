@@ -20,7 +20,7 @@ class DirectorSerializer(serializers.ModelSerializer):
         return director.movie_count()
 
 class MovieSerializer(serializers.ModelSerializer):
-    director = DirectorSerializer()
+    director = serializers.PrimaryKeyRelatedField(pk_field='id', queryset=Director.objects.all())
     rating = serializers.SerializerMethodField()
     class Meta:
         model = Movie
@@ -36,8 +36,8 @@ class MovieSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = UserSimpleSerializer()
-    movie = MovieSerializer()
+    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), pk_field='id')
+    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all(), pk_field='id')
     class Meta:
         model = Review
         fields = '__all__'

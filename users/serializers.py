@@ -9,9 +9,10 @@ class ValidateUserSerializer(serializers.Serializer):
 
 
 class CreateUserSerializer(ValidateUserSerializer):
-    def validateUsername(self,username):
+    def validate_username(self, username):
         try:
             User.objects.get(username=username)
-        except User.DoesNotExist:
+        except:
             return username
         raise ValidationError("This username already exists!")
+
